@@ -3,12 +3,12 @@
     <server>
         <name>CCW-01</name>
     </server>
-    <task>
-        <copy>
-            <copy_archive>
-                <source>test/</source>
-                <destination>test2/</destination>
-            </copy_archive>
-        </copy>
-    </task>
+    <tasks>
+        <copy_archive>
+            <source>test</source>
+            <destination>test2</destination>
+            <username>Administrator</username>
+            <password>secretpasswort123</password>
+        </copy_archive>
+    </tasks>
 </config>
