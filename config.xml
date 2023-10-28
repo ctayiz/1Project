@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <server>
+        <name>CCW-01</name>
+    </server>
+    <task>
+        <copy>
+            <copy_archive>
+                <source>test/</source>
+                <destination>test2/</destination>
+            </copy_archive>
+        </copy>
+    </task>
+</config>
