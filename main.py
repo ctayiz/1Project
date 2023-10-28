@@ -22,24 +22,6 @@ def info_box():
 def print_entry_input():
     print(entry1.get())
 
-def copy_archive(source, dest):
-    # Überprüfe, ob das Zielverzeichnis existiert, falls nicht, erstelle es
-    if not os.path.exists(dest):
-        os.makedirs(dest)
-
-    # Durchsuche die Quellordnerstruktur nach Dateien
-    for root, _, files in os.walk(source):
-        for file in files:
-            quelle_dateipfad = os.path.join(root, file)
-            ziel_dateipfad = os.path.join(dest, os.path.relpath(quelle_dateipfad, source))
-
-            # Überprüfe, ob die Datei im Zielordner existiert, andernfalls kopiere sie
-            if not os.path.exists(ziel_dateipfad):
-                shutil.copy(quelle_dateipfad, ziel_dateipfad)
-                print(f"Kopiere {quelle_dateipfad} nach {ziel_dateipfad}")
-
-    # copy_archive(quelle_verzeichnis, ziel_verzeichnis)
-
 root = tk.Tk()
 root.title("CCW MigrationsTool")
 # set windowsize
@@ -60,7 +42,7 @@ label_source.pack()
 label_dest = tk.Label(root, text="Destination: " + dest)
 label_dest.pack()
 
-btn_copy = tk.Button(root, text="Go copy", command=copy_archive *arg: copy_archive(quelle_verzeichnis, ziel_verzeichnis))
+btn_copy = tk.Button(root, text="Go copy")
 btn_copy.pack()
 
 btn_destroy = ttk.Button (root, text="Cancel", command=root.destroy)
