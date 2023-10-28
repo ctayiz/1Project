@@ -16,7 +16,7 @@ root.title("CCW MigrationsTool")
 # set windowsize
 root.geometry("600x600")
 root.minsize(width=400, height=400)
-root.maxsize(width=850, height=850)
+root.maxsize(width=800, height=800)
 
 
 label1 = tk.Label(root, text="MigrationsTool")
