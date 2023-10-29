@@ -1,32 +1,32 @@
 import os
 import shutil
+from datetime import datetime
 
-def sync_folders(source, destination):
+def sync_folders(source, destination, log_file):
     try:
-        for root, dirs, files in os.walk(source):
-            relative_path = os.path.relpath(root, source)
-            destination_path = os.path.join(destination, relative_path)
+        with open(log_file, 'a') as log:
+            log.write(f"Synchronisierung gestartet am {datetime.now()}\n")
+            for root, dirs, files in os.walk(source):
+                relative_path = os.path.relpath(root, source)
+                destination_path = os.path.join(destination, relative_path)
 
-            if not os.path.exists(destination_path):
-                os.makedirs(destination_path)
+                if not os.path.exists(destination_path):
+                    os.makedirs(destination_path)
 
-            for file in files:
-                source_file = os.path.join(root, file)
-                dest_file = os.path.join(destination_path, file)
+                for file in files:
+                    source_file = os.path.join(root, file)
+                    dest_file = os.path.join(destination_path, file)
 
-                if os.path.exists(dest_file):
-                    # Überprüfe die Änderungszeit und kopiere, wenn die Quelldatei neuer ist
-                    if os.path.getmtime(source_file) > os.path.getmtime(dest_file):
+                    if os.path.exists(dest_file):
+                        if os.path.getmtime(source_file) > os.path.getmtime(dest_file):
+                            shutil.copy2(source_file, destination_path)
+                            log.write(f"Kopiere {file} von {source} nach {destination}\n")
+                    else:
                         shutil.copy2(source_file, destination_path)
-                        print(f"Kopiere {file} von {source} nach {destination}")
-                else:
-                    shutil.copy2(source_file, destination_path)
-                    print(f"Kopiere {file} von {source} nach {destination}")
+                        log.write(f"Kopiere {file} von {source} nach {destination}\n")
 
-        print("Ordner erfolgreich synchronisiert.")
+            log.write(f"Synchronisierung abgeschlossen {datetime.now()}\n")
+        print("Ordner erfolgreich synchronisiert. Logdatei erstellt.")
     except Exception as e:
         print(f"Fehler beim Synchronisieren der Ordner: {e}")
 
-# Beispielaufruf
-source_path = 'test'
-destination_path = 'test2'

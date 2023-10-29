@@ -6,16 +6,32 @@ import shutil
 import os
 from sync_archive import *
 
-# config.xml einlesen
-tree = ET.parse("config.xml")
-config = tree.getroot()
+# Pfad zur XML-Datei
+file_path = 'config.xml'
 
-# source = config.find("source").text
-servername = config[0][0].text
-source = config[1][0][0].text
-dest = config[1][0][1].text
-username = config[1][0][2].text
-password = config[1][0][3].text
+# XML-Datei einlesen
+tree = ET.parse(file_path)
+root = tree.getroot()
+
+# Parameter unter <copy_archive> extrahieren
+copy_archive = root.find('tasks/copy_archive')
+server = root.find('server')
+
+source = copy_archive.find('source').text
+dest = copy_archive.find('destination').text
+username = copy_archive.find('username').text
+password = copy_archive.find('password').text
+logfile = copy_archive.find('logfile').text
+
+servername = server.find('name').text
+
+# Ausgabe der extrahierten Werte
+print(f"Source: {source}")
+print(f"Destination: {dest}")
+print(f"Username: {username}")
+print(f"Password: {password}")
+print(f"Logfile: {logfile}")
+print(f"Servername: {servername}")
 
 # functions
 def info_box():
@@ -39,14 +55,19 @@ root.columnconfigure(1, weight=1)
 root.columnconfigure(2, weight=1)
 root.rowconfigure(0, weight=1)
 
+# set variable
+source_path = source
+destination_path = dest
+log_file_path = logfile
+
 # widgets
 label_servername = tk.Label(root, text="Servername:")
-label_var_severname = tk.Label(root, text=servername)
+label_var_severname = tk.Label(root, text=servername, border=1)
 label_source = tk.Label(root, text="Source:")
 label_var_source = tk.Label(root, text=source)
 label_dest = tk.Label(root, text="Destination:")
 label_var_dest = tk.Label(root, text=dest)
-btn_copy = ttk.Button(root, text="Go copy", command=lambda:sync_folders(source_path, destination_path))
+btn_copy = ttk.Button(root, text="START COPY", command=lambda:sync_folders(source_path, destination_path, log_file_path))
 btn_destroy = ttk.Button (root, text="Cancel", command=root.destroy)
 btn_info = ttk.Button (root, text="Info", command=info_box)
 

@@ -9,6 +9,7 @@
             <destination>test2</destination>
             <username>Administrator</username>
             <password>secretpasswort123</password>
+            <logfile>copy.log</logfile>
         </copy_archive>
     </tasks>
 </config>
