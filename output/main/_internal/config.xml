@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <server>
+        <name>CCW-01</name>
+    </server>
+    <tasks>
+        <copy_archive>
+            <source>test</source>
+            <destination>test2</destination>
+            <username>Administrator</username>
+            <password>secretpasswort123</password>
+            <logfile>copy.log</logfile>
+        </copy_archive>
+    </tasks>
+</config>
