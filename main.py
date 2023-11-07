@@ -1,161 +1,110 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-import xml.etree.ElementTree as ET
-import shutil
-import os
-from sync_archive import *
+from ttkbootstrap.constants import *
+import ttkbootstrap  as tb
+import socket
 import psutil
-import time
 import subprocess
+import time
+import threading
 
-'''
-def monitor():
-    while True:
-        service = psutil.win_service_get('Spooler')
-        status = service.status()
-        label_var_service = tk.Label(root, text=status + "1123")
-        label_var_service.place(x=130, y=80)
-        print(status)
-        time.sleep(5)
-     #   return status
-'''
-   
-# Pfad zur XML-Datei
-file_path = 'config.xml'
+root = tb.Window(themename="superhero")
+root.title("CCW Tool by Cihan")
+root.geometry("600x300")
 
-# XML-Datei einlesen
-tree = ET.parse(file_path)
-root = tree.getroot()
-
-# Parameter unter <copy_archive> extrahieren
-copy_archive = root.find('tasks/copy_archive')
-server = root.find('server')
-
-source = copy_archive.find('source').text
-dest = copy_archive.find('destination').text
-username = copy_archive.find('username').text
-password = copy_archive.find('password').text
-logfile = copy_archive.find('logfile').text
-
-servername = server.find('name').text
-
-'''
-# Ausgabe der extrahierten Werte
-print(f"Source: {source}")
-print(f"Destination: {dest}")
-print(f"Username: {username}")
-print(f"Password: {password}")
-print(f"Logfile: {logfile}")
-print(f"Servername: {servername}") '''
+frame = tb.Frame(root)
+frame.pack()
 
 # functions
-def info_box():
-   tk.messagebox.showinfo(title="Info", message="Dieses Tool wurde von Cihan Tayiz programmiert. Es werden keinerlei Haftungen für die Auswirkungen übernommen.")
-
-def copy_archive():
-    shutil.copytree(source,dest)
-
-def iis_reset():
-    try:
-        subprocess.call(["iisreset"], shell=True)
-    except:
-        print("Dienst konnte nicht neugestartet werden.")
-
-# root window
-root = tk.Tk()
-root.title("CCW MigrationsTool")
-
-# set windowsize
-root.geometry("500x500")
-root.minsize(width=400, height=400)
-root.maxsize(width=600, height=600)
-
-# define frames
-frame1 = tk.Frame(root, border=10, bg="black")
-frame1.grid(row=4, column=0)
-
-# define a grid
-root.columnconfigure(0, weight=1)
-root.columnconfigure(1, weight=1)
-root.columnconfigure(2, weight=1)
-root.rowconfigure(0, weight=1)
-
-# set variable
-source_path = source
-destination_path = dest
-log_file_path = logfile
-
-# widgets
-label_servername = tk.Label(root, text="Servername:")
-label_var_severname = tk.Label(root, text=servername, border=1)
-label_source = tk.Label(root, text="Source:")
-label_var_source = tk.Label(root, text=source)
-label_dest = tk.Label(root, text="Destination:")
-label_var_dest = tk.Label(root, text=dest)
-btn_copy = ttk.Button(root, text="START COPY", command=lambda:sync_folders(source_path, destination_path, log_file_path))
-btn_destroy = ttk.Button (root, text="Cancel", command=root.destroy)
-btn_info = ttk.Button (root, text="Info", command=info_box)
-label_service = tk.Label(root, text="Dienst Status: ")
-btn_iis_reset = ttk.Button(root, text="IISRESET", command=lambda:iis_reset())
-
-
-# place a widget
-label_servername.place(x=20, y=20)
-label_var_severname.place(x=130, y=20)
-label_source.place(x=20, y=40)
-label_var_source.place(x=130, y=40)
-label_dest.place(x=20, y=60)
-label_var_dest.place(x=130, y=60)
-btn_copy.grid(row=3, column=0, sticky="nsew")
-btn_destroy.grid(row=3, column=2, sticky="nsew")
-btn_info.grid(row=3, column=1, sticky="nsew")
-label_service.place(x=20, y=80)
-btn_iis_reset.grid(row=2, column=0)
-
 
 def get_service_status(service_name):
-    service = psutil.win_service_get(service_name)
-    return service.status()
-
-def start_service():
     try:
-        service = psutil.win_service_get("Spooler")
-        subprocess.Popen(["net", "start", "Spooler"], shell=True)
-        status_label.config(text="Dienst gestartet")
-    except psutil.AccessDenied:
-        status_label.config(text="Zugriff verweigert: Benötigt Administratorrechte")
-    except Exception as e:
-        status_label.config(text=f"Fehler beim Starten des Dienstes: {e}")
+        service = psutil.win_service_get(service_name)
+        return service.status()
+    except:
+        print("Dienste wurden nicht gefunden!")
 
-def stop_service():
-    try:
-        service = psutil.win_service_get("Spooler")
-        subprocess.call(["net", "stop", "Spooler"], shell=True)
-        status_label.config(text="Dienst gestoppt")
-    except psutil.AccessDenied:
-        status_label.config(text="Zugriff verweigert: Benötigt Administratorrechte")
-    except Exception as e:
-        status_label.config(text=f"Fehler beim Stoppen des Dienstes: {e}")
+def update_status(var_service_names):
+    for var_service_name in var_service_names:
+        status = get_service_status(var_service_name)
+        if status == "running":
+            print(f"{var_service_name} Dienst ist {status}")
+            exec(f"lb_{var_service_name}_var.config(text='{status}')")
+        elif status == "stopped":
+            print(f"{var_service_name} Dienst ist {status}")
+            exec(f"lb_{var_service_name}_var.config(text='{status}')")
+            
+    root.after(3000, lambda: update_status(var_service_names))  # Aktualisierung alle 3 Sekunden
+
+def check_process_existence(process_name, label_var):
+    for proc in psutil.process_iter(['pid', 'name']):
+        if process_name.lower() in proc.info['name'].lower():
+            lb_GEDicom_var.config(text="running")
+            return
+
+    lb_GEDicom_var.config(text="not running")   
+
+def update_status_dicom():
+    global lb_GEDicom_var  # Global deklarieren, um auf das Label zuzugreifen
+    check_process_existence('GEDicomServer.exe', lb_GEDicom_var)
+    root.after(3000, update_status_dicom)  # Überprüfung alle 3 Sekunden
+
+process_name = 'Greenshot.exe'
+
+# array´s
+var_service_names = ['GEServiceController', 'GECardConv']
+
+# server_info = tb.LabelFrame(frame, bootstyle="info")
+server_info = tb.Label(frame)
+server_info.grid(row=0, column=0, sticky="ew", padx=20, pady=20)
+
+# dienst_status = tb.LabelFrame(frame, bootstyle="info")
+dienst_status = tb.Label(frame)
+dienst_status.grid(row=0, column=1, sticky="ew", padx=20, pady=20)
+
+lb_serverinfo = tb.Label(server_info, text="Serverinformationen", font=('Verdana',8,'bold','underline'))
+lb_serverinfo.grid(row=0, column=0, sticky="ew")
+
+lb_dienste = tb.Label(dienst_status, text="Dienste und Prozesse", font=('Verdana',8,'bold','underline'))
+lb_dienste.grid(row=0, column=0, sticky="ew")
+
+lb_hostname = tb.Label(server_info, text="Hostname:")
+lb_hostname.grid(row=1, column=0, sticky="ew")
+
+lb_hostname_var = tb.Label(server_info, text=socket.gethostname())
+lb_hostname_var.grid(row=1, column=1, sticky="ew")
+
+lb_fqdn = tb.Label(server_info, text="FQDN:")
+lb_fqdn.grid(row=2, column=0, sticky="ew")
+
+lb_fqdn_var = tb.Label(server_info, text=socket.getfqdn())
+lb_fqdn_var.grid(row=2, column=1, sticky="ew")
+
+lb_ip_address = tb.Label(server_info, text="IP-Adresse:")
+lb_ip_address.grid(row=3, column=0, sticky="ew")
+
+lb_ip_address_var = tb.Label(server_info, text=socket.gethostbyname(socket.gethostname()))
+lb_ip_address_var.grid(row=3, column=1, sticky="ew")
+
+lb_gesc = tb.Label(dienst_status, text="GEServiceController")
+lb_gesc.grid(row=1, column=0, sticky="ew", padx=4)
+
+lb_gecardcov = tb.Label(dienst_status, text="GECardConv")
+lb_gecardcov.grid(row=2, column=0, sticky="ew", padx=4)
+
+lb_GECardConv_var = tb.Label(dienst_status, text="")
+lb_GECardConv_var.grid(row=2, column=1, sticky="ew", padx=4)
+
+lb_dicomserver = tb.Label(dienst_status, text="DicomServer")
+lb_dicomserver.grid(row=3, column=0, sticky="ew", padx=4)
+
+lb_GEServiceController_var = tb.Label(dienst_status, text="")
+lb_GEServiceController_var.grid(row=1, column=1, sticky="ew", padx=4)
+
+lb_GEDicom_var = tb.Label(dienst_status, text="")
+lb_GEDicom_var.grid(row=3, column=1, sticky="ew", padx=4)
+
+update_status(var_service_names)
+update_status_dicom()
 
 
-def update_status():
-    status = get_service_status("Spooler")
-    status_label.config(text=f"{status}")
-    root.after(5000, update_status)  # Aktualisierung alle 5 Sekunden
-
-status_label = tk.Label(root, text="")
-status_label.place(x=130, y=80)
-
-start_button = ttk.Button(root, text="Start", command=start_service)
-start_button.place(x=250, y=80)
-
-stop_button = ttk.Button(root, text="Stop", command=stop_service)
-stop_button.place(x=350, y=80)
-
-update_status()  # Erste Statusaktualisierung starten
-
-
-# run
 root.mainloop()
-
