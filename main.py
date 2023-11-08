@@ -12,7 +12,7 @@ root.title("CCW Tool by Cihan")
 root.geometry("600x300")
 
 frame = tb.Frame(root)
-frame.pack()
+frame.grid(row=0, column=0)
 
 # functions
 
@@ -48,7 +48,7 @@ def update_status_dicom():
     check_process_existence('GEDicomServer.exe', lb_GEDicom_var)
     root.after(3000, update_status_dicom)  # Überprüfung alle 3 Sekunden
 
-process_name = 'Greenshot.exe'
+process_name = 'GEDicomServer.exe'
 
 # array´s
 var_service_names = ['GEServiceController', 'GECardConv']
