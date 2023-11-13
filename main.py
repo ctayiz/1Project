@@ -9,7 +9,7 @@ import threading
 
 root = tb.Window(themename="superhero")
 root.title("CCW Tool by Cihan")
-root.geometry("600x300")
+root.geometry("800x300")
 
 frame = tb.Frame(root)
 frame.grid(row=0, column=0)
