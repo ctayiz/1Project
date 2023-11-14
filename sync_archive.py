@@ -5,7 +5,7 @@ from datetime import datetime
 def sync_folders(source, destination, log_file):
     try:
         with open(log_file, 'a') as log:
-            log.write(f"Synchronisierung gestartet am {datetime.now()}\n")
+            log.write(f"=============\nSynchronisierung gestartet am {datetime.now()}\n")
             for root, dirs, files in os.walk(source):
                 relative_path = os.path.relpath(root, source)
                 destination_path = os.path.join(destination, relative_path)
@@ -20,10 +20,10 @@ def sync_folders(source, destination, log_file):
                     if os.path.exists(dest_file):
                         if os.path.getmtime(source_file) > os.path.getmtime(dest_file):
                             shutil.copy2(source_file, destination_path)
-                            log.write(f"Kopiere {file} von {source} nach {destination}\n")
+                            log.write(f"Kopiere {file}\n")
                     else:
                         shutil.copy2(source_file, destination_path)
-                        log.write(f"Kopiere {file} von {source} nach {destination}\n")
+                        log.write(f"Kopiere {file}\n")
 
             log.write(f"Synchronisierung abgeschlossen {datetime.now()}\n")
         print("Ordner erfolgreich synchronisiert. Logdatei erstellt.")

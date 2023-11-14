@@ -5,10 +5,13 @@
     </server>
     <tasks>
         <copy_archive>
-            <source>test</source>
+            <source>\\G7TCJ5Y2E\test</source>
             <destination>test2</destination>
-            <username>Administrator</username>
-            <password>secretpasswort123</password>
+            <credentials>false</credentials>
+            <!-- if credentials true then input the username and password-->
+            <username>Test</username>
+            <password>Test1234!</password>
+            <drive_letter>Z</drive_letter>
             <logfile>copy.log</logfile>
         </copy_archive>
     </tasks>
